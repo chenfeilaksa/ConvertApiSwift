@@ -13,6 +13,12 @@ public enum SupportedType: String {
     case doc
     case txt
     case html
+    case png
+    case jpg
+    case ppt
+    case pdf
+    case xlsx
+    case xls
 }
 
 public struct Converted: Codable {

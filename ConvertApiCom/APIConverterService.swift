@@ -9,11 +9,11 @@
 import Foundation
 
 fileprivate let kBaseUrlFormat = "https://v2.convertapi.com/convert/%@"
-fileprivate let kSecretParameterFormat = "/to/pdf?Secret=%@"
+fileprivate let kSecretParameterFormat = "/to/%@?Secret=%@"
 
 public protocol APIConverterService {
     typealias Handler = (Result<Converted, ConvertError>) -> Void
-    func convertFileToPDF(type: SupportedType, fileData: Data, handler: @escaping Handler)
+    func convertFileToType(type: SupportedType, toType: SupportedType, fileData: Data, handler: @escaping Handler)
 }
 
 public final class APIConverterServiceImp: APIConverterService {
@@ -23,7 +23,7 @@ public final class APIConverterServiceImp: APIConverterService {
         configModel = ConfigImp()
     }
     
-    public func convertFileToPDF(type: SupportedType, fileData: Data, handler: @escaping Handler) {
+    public func convertFileToType(type: SupportedType, toType: SupportedType, fileData: Data, handler: @escaping Handler) {
         guard let token = configModel?.getToken() else  {
             handler(.failure(.noToken))
             return
@@ -40,8 +40,8 @@ public final class APIConverterServiceImp: APIConverterService {
                 "Name":"myFile.\(type.rawValue)","Data":string]]]]
         
         let base = String(format: kBaseUrlFormat, type.rawValue)
-        let secret = String(format: kSecretParameterFormat, token)
-        
+        let secret = String(format: kSecretParameterFormat, toType.rawValue, token)
+
         var request = URLRequest(url: URL(string: "\(base)\(secret)")!)
         request.httpMethod = "POST"
         request.httpBody = try? JSONSerialization.data(withJSONObject: parameters, options: [])
